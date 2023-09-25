@@ -1,34 +1,68 @@
 package com.example.areader.components
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
+import com.example.areader.R
+import com.example.areader.model.MBook
+import com.example.areader.navigation.AllScreens
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun ReaderLogo(modifier: Modifier = Modifier) {
@@ -164,5 +198,250 @@ fun CircleProgress() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         CircularProgressIndicator()
+    }
+}
+
+
+@Composable
+fun FABContent(onTap: (String) -> Unit) {
+    FloatingActionButton(
+        onClick = { onTap("") },
+        shape = RoundedCornerShape(50.dp),
+        containerColor = Color(0xFF92CBDF)
+    ) {
+        Icon(
+            imageVector = Icons.Default.Add,
+            contentDescription = null,
+            tint = Color.White
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AppBar(
+    title: String,
+    showProfile: Boolean = true,
+    icon: ImageVector? = null,
+    navController: NavController,
+    onBackArrowClicked: () -> Unit = {}
+) {
+    TopAppBar(title = {
+        if (showProfile) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+
+                Icon(
+                    painter = painterResource(id = R.drawable.book),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(50.dp)
+                        .clip(
+                            RoundedCornerShape(12.dp)
+                        )
+                        .scale(0.6f)
+                )
+
+                Spacer(modifier = Modifier.width(5.dp))
+                Text(
+                    text = title, style = TextStyle(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp,
+                        color = Color.Red.copy(alpha = 0.7f),
+                    )
+                )
+            }
+        }
+        if (icon != null) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = Color.Red.copy(alpha = 0.7f),
+                    modifier = Modifier.clickable { onBackArrowClicked.invoke() }
+                )
+                Text(
+                    text = title, style = TextStyle(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp,
+                        color = Color.Red.copy(alpha = 0.7f),
+                    )
+                )
+                Row {}
+            }
+        }
+
+    }, actions = {
+        if (showProfile) {
+            IconButton(onClick = {
+                FirebaseAuth.getInstance().signOut().run {
+                    navController.navigate(route = AllScreens.LoginScreen.name) {
+                        navController.popBackStack()
+                        navController.popBackStack()
+                        navController.popBackStack()
+                    }
+                }
+            }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.logout),
+                    contentDescription = null
+                )
+            }
+        }
+        else{
+            Row{
+
+            }
+        }
+    },
+        colors = TopAppBarDefaults.smallTopAppBarColors(
+            containerColor = Color.Transparent
+        )
+    )
+
+}
+
+@Composable
+fun TitleSection(modifier: Modifier = Modifier, label: String) {
+    Surface(modifier = modifier.padding(start = 5.dp, top = 1.dp)) {
+        Column {
+            Text(
+                text = label,
+                fontSize = 19.sp,
+                fontStyle = FontStyle.Normal,
+                textAlign = TextAlign.Left
+            )
+        }
+    }
+}
+
+@Composable
+fun ListCard(book: MBook, onPressDetails: (String) -> Unit) {
+
+    val context = LocalContext.current
+    val resources = context.resources
+
+    val displayMetrics = resources.displayMetrics
+
+    val screenWidth = displayMetrics.widthPixels / displayMetrics.density
+    val spacing = 10.dp
+    Card(
+        shape = RoundedCornerShape(29.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        ), elevation = CardDefaults.cardElevation(6.dp),
+        modifier = Modifier
+            .padding(16.dp)
+            .height(242.dp)
+            .width(202.dp)
+            .clickable { onPressDetails.invoke(book.title.toString()) }
+    ) {
+        Column(
+            modifier = Modifier.width(screenWidth.dp - (spacing * 2)),
+            horizontalAlignment = Alignment.Start
+        ) {
+            Row(horizontalArrangement = Arrangement.Center) {
+                Image(
+                    painter = rememberAsyncImagePainter(model = "http://books.google.com/books/content?id=LFBXd7hjAe0C&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api"),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .height(140.dp)
+                        .width(100.dp)
+                        .padding(4.dp)
+                )
+                Spacer(modifier = Modifier.width(50.dp))
+                Column(
+                    modifier = Modifier.padding(top = 25.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.FavoriteBorder,
+                        contentDescription = null,
+                        modifier = Modifier.padding(bottom = 1.dp)
+                    )
+
+                    BookRating(score = 3.4)
+
+                }
+            }
+            Text(
+                text = book.title.toString(),
+                modifier = Modifier.padding(4.dp),
+                fontWeight = FontWeight.Bold,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = book.authors.toString(),
+                modifier = Modifier.padding(4.dp),
+                style = MaterialTheme.typography.bodyLarge
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                RoundedButton(label = "Reading", radius = 70) {}
+
+            }
+
+        }
+
+    }
+}
+
+
+@Composable
+fun RoundedButton(label: String, radius: Int, onPress: () -> Unit) {
+    Surface(
+        modifier = Modifier.clip(
+            shape = RoundedCornerShape(
+                bottomEndPercent = radius,
+                topStartPercent = radius
+            )
+        ), color = Color(0xFF92CBDF)
+    ) {
+        Column(
+            modifier = Modifier
+                .width(90.dp)
+                .heightIn(40.dp)
+                .clickable { onPress.invoke() },
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = label, style = TextStyle(color = Color.White, fontSize = 15.sp))
+        }
+    }
+}
+
+@Composable
+fun BookRating(score: Double) {
+    Surface(
+        modifier = Modifier
+            .height(70.dp)
+            .padding(4.dp),
+        shape = RoundedCornerShape(56.dp),
+        shadowElevation = 6.dp,
+        color = Color.White
+    ) {
+        Column(modifier = Modifier.padding(4.dp)) {
+            Icon(
+                imageVector = Icons.Filled.Star,
+                contentDescription = null,
+                modifier = Modifier.padding(3.dp)
+            )
+
+            Text(text = score.toString(), style = MaterialTheme.typography.titleMedium)
+
+        }
     }
 }
