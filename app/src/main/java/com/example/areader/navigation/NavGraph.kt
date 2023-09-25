@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.areader.screens.details.DetailsScreen
+import com.example.areader.screens.details.DetailsViewModel
 import com.example.areader.screens.home.HomeScreen
 import com.example.areader.screens.login.LoginScreen
 import com.example.areader.screens.search.SearchScreen
@@ -38,9 +39,11 @@ fun NavGraph() {
                 type = NavType.StringType
             }
         )) {
+            val detailsViewModel = hiltViewModel<DetailsViewModel>()
             DetailsScreen(
                 navController = navController,
-                bookId = it.arguments?.getString("BookId").toString()
+                bookId = it.arguments?.getString("BookId").toString(),
+                detailsViewModel = detailsViewModel
             )
         }
         composable(route = AllScreens.SearchScreen.name) {
