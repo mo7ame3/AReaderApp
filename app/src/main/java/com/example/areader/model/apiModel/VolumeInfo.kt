@@ -3,7 +3,7 @@ package com.example.areader.model.apiModel
 data class VolumeInfo(
     val allowAnonLogging: Boolean,
     val authors: List<String>,
-    val averageRating: Int,
+    val averageRating: Double,
     val canonicalVolumeLink: String,
     val categories: List<String>,
     val contentVersion: String,

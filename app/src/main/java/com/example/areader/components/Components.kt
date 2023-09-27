@@ -1,26 +1,19 @@
 package com.example.areader.components
 
+import android.view.MotionEvent
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -36,14 +29,15 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -140,8 +134,7 @@ fun PasswordInput(
 ) {
     val visualTransformation =
         if (passwordVisibility.value) VisualTransformation.None else PasswordVisualTransformation()
-    OutlinedTextField(
-        value = passwordState.value,
+    OutlinedTextField(value = passwordState.value,
         onValueChange = {
             passwordState.value = it
         },
@@ -153,13 +146,11 @@ fun PasswordInput(
             .fillMaxWidth(),
         enabled = enabled,
         keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Password,
-            imeAction = imeAction
+            keyboardType = KeyboardType.Password, imeAction = imeAction
         ),
         keyboardActions = onAction,
         visualTransformation = visualTransformation,
-        trailingIcon = { PasswordVisibility(passwordVisibility = passwordVisibility) }
-    )
+        trailingIcon = { PasswordVisibility(passwordVisibility = passwordVisibility) })
 }
 
 @Composable
@@ -172,10 +163,7 @@ fun PasswordVisibility(passwordVisibility: MutableState<Boolean>) {
 
 @Composable
 fun SubmitButton(
-    textId: String,
-    loading: Boolean,
-    validInputs: Boolean,
-    onClick: () -> Unit
+    textId: String, loading: Boolean, validInputs: Boolean, onClick: () -> Unit
 ) {
     Button(
         onClick = onClick,
@@ -210,9 +198,7 @@ fun FABContent(onTap: (String) -> Unit) {
         containerColor = Color(0xFF92CBDF)
     ) {
         Icon(
-            imageVector = Icons.Default.Add,
-            contentDescription = null,
-            tint = Color.White
+            imageVector = Icons.Default.Add, contentDescription = null, tint = Color.White
         )
     }
 }
@@ -261,12 +247,10 @@ fun AppBar(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
 
-                Icon(
-                    imageVector = icon,
+                Icon(imageVector = icon,
                     contentDescription = null,
                     tint = Color.Red.copy(alpha = 0.7f),
-                    modifier = Modifier.clickable { onBackArrowClicked.invoke() }
-                )
+                    modifier = Modifier.clickable { onBackArrowClicked.invoke() })
                 Text(
                     text = title, style = TextStyle(
                         fontWeight = FontWeight.Bold,
@@ -290,20 +274,17 @@ fun AppBar(
                 }
             }) {
                 Icon(
-                    painter = painterResource(id = R.drawable.logout),
-                    contentDescription = null
+                    painter = painterResource(id = R.drawable.logout), contentDescription = null
                 )
             }
-        }
-        else{
-            Row{
+        } else {
+            Row {
 
             }
         }
-    },
-        colors = TopAppBarDefaults.smallTopAppBarColors(
-            containerColor = Color.Transparent
-        )
+    }, colors = TopAppBarDefaults.smallTopAppBarColors(
+        containerColor = Color.Transparent
+    )
     )
 
 }
@@ -332,24 +313,23 @@ fun ListCard(book: MBook, onPressDetails: (String) -> Unit) {
 
     val screenWidth = displayMetrics.widthPixels / displayMetrics.density
     val spacing = 10.dp
-    Card(
-        shape = RoundedCornerShape(29.dp),
+    Card(shape = RoundedCornerShape(29.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.White
-        ), elevation = CardDefaults.cardElevation(6.dp),
+        ),
+        elevation = CardDefaults.cardElevation(6.dp),
         modifier = Modifier
             .padding(16.dp)
             .height(242.dp)
             .width(202.dp)
-            .clickable { onPressDetails.invoke(book.title.toString()) }
-    ) {
+            .clickable { onPressDetails.invoke(book.title.toString()) }) {
         Column(
             modifier = Modifier.width(screenWidth.dp - (spacing * 2)),
             horizontalAlignment = Alignment.Start
         ) {
             Row(horizontalArrangement = Arrangement.Center) {
                 Image(
-                    painter = rememberAsyncImagePainter(model = "http://books.google.com/books/content?id=LFBXd7hjAe0C&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api"),
+                    painter = rememberAsyncImagePainter(model = book.photoUrl.toString()),
                     contentDescription = null,
                     modifier = Modifier
                         .height(140.dp)
@@ -368,7 +348,7 @@ fun ListCard(book: MBook, onPressDetails: (String) -> Unit) {
                         modifier = Modifier.padding(bottom = 1.dp)
                     )
 
-                    BookRating(score = 3.4)
+                    BookRating(score = book.rating.toString())
 
                 }
             }
@@ -382,6 +362,8 @@ fun ListCard(book: MBook, onPressDetails: (String) -> Unit) {
             Text(
                 text = book.authors.toString(),
                 modifier = Modifier.padding(4.dp),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.bodyLarge
             )
 
@@ -405,8 +387,7 @@ fun RoundedButton(label: String, radius: Int, onPress: () -> Unit) {
     Surface(
         modifier = Modifier.clip(
             shape = RoundedCornerShape(
-                bottomEndPercent = radius,
-                topStartPercent = radius
+                bottomEndPercent = radius, topStartPercent = radius
             )
         ), color = Color(0xFF92CBDF)
     ) {
@@ -424,7 +405,7 @@ fun RoundedButton(label: String, radius: Int, onPress: () -> Unit) {
 }
 
 @Composable
-fun BookRating(score: Double) {
+fun BookRating(score: String) {
     Surface(
         modifier = Modifier
             .height(70.dp)
@@ -433,15 +414,72 @@ fun BookRating(score: Double) {
         shadowElevation = 6.dp,
         color = Color.White
     ) {
-        Column(modifier = Modifier.padding(4.dp)) {
+        Column(
+            modifier = Modifier.padding(4.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Icon(
                 imageVector = Icons.Filled.Star,
                 contentDescription = null,
                 modifier = Modifier.padding(3.dp)
             )
 
-            Text(text = score.toString(), style = MaterialTheme.typography.titleMedium)
+            Text(text = score, style = MaterialTheme.typography.titleMedium)
 
+        }
+    }
+}
+
+
+//rating animation
+@ExperimentalComposeUiApi
+@Composable
+fun RatingBar(
+    modifier: Modifier = Modifier,
+    rating: Int,
+    onPressRating: (Int) -> Unit
+) {
+    var ratingState by remember {
+        mutableStateOf(rating)
+    }
+
+    var selected by remember {
+        mutableStateOf(false)
+    }
+    val size by animateDpAsState(
+        targetValue = if (selected) 42.dp else 34.dp,
+        spring(Spring.DampingRatioMediumBouncy), label = ""
+    )
+
+    Row(
+        modifier = Modifier.width(280.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        for (i in 1..5) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_baseline_star_24),
+                contentDescription = "star",
+                modifier = modifier
+                    .width(size)
+                    .height(size)
+                    .pointerInteropFilter {
+                        when (it.action) {
+                            MotionEvent.ACTION_DOWN -> {
+                                selected = true
+                                onPressRating(i)
+                                ratingState = i
+                            }
+
+                            MotionEvent.ACTION_UP -> {
+                                selected = false
+                            }
+                        }
+                        true
+                    },
+                tint = if (i <= ratingState) Color(0xFFFFD700) else Color(0xFFA2ADB1)
+            )
         }
     }
 }

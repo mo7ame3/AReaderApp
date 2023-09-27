@@ -200,7 +200,8 @@ fun saveToFirebase(book: MBook, navController: NavController) {
                         Log.w("TAG", "SaveToFirebase: Error updating doc ", it)
                     }
             }
-    } else {
-
+    }
+    else {
+        Log.w("TAG", "SaveToFirebase: Error updating doc ")
     }
 }

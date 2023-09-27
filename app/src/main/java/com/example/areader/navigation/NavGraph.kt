@@ -12,6 +12,7 @@ import androidx.navigation.navArgument
 import com.example.areader.screens.details.DetailsScreen
 import com.example.areader.screens.details.DetailsViewModel
 import com.example.areader.screens.home.HomeScreen
+import com.example.areader.screens.home.HomeViewModel
 import com.example.areader.screens.login.LoginScreen
 import com.example.areader.screens.search.SearchScreen
 import com.example.areader.screens.search.SearchViewModel
@@ -32,7 +33,9 @@ fun NavGraph() {
             LoginScreen(navController = navController)
         }
         composable(route = AllScreens.HomeScreen.name) {
-            HomeScreen(navController = navController)
+            val homeViewModel = hiltViewModel<HomeViewModel>()
+
+            HomeScreen(navController = navController, homeViewModel = homeViewModel)
         }
         composable(route = AllScreens.DetailsScreen.name + "/{BookId}", arguments = listOf(
             navArgument(name = "BookId") {
@@ -53,8 +56,18 @@ fun NavGraph() {
         composable(route = AllScreens.StatsScreen.name) {
             StatsScreen(navController = navController)
         }
-        composable(route = AllScreens.UpdateScreen.name) {
-            UpdateScreen(navController = navController)
+        composable(route = AllScreens.UpdateScreen.name + "/{bookItemId}", arguments = listOf(
+            navArgument("bookItemId") {
+                type = NavType.StringType
+            }
+        )) {
+            val homeViewModel = hiltViewModel<HomeViewModel>()
+
+            UpdateScreen(
+                navController = navController,
+                bookItemId = it.arguments?.getString("bookItemId").toString(),
+                homeViewModel = homeViewModel
+            )
         }
     }
 }

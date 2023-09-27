@@ -40,7 +40,7 @@ import com.google.firebase.auth.FirebaseAuth
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @ExperimentalMaterial3Api
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(navController: NavController, homeViewModel: HomeViewModel) {
 
     Scaffold(
         topBar = { AppBar(title = "A.Reader", navController = navController) },
@@ -54,7 +54,7 @@ fun HomeScreen(navController: NavController) {
                 .fillMaxSize()
                 .padding(top = 50.dp)
         ) {
-            HomeContent(navController = navController)
+            HomeContent(navController = navController, homeViewModel = homeViewModel)
         }
     }
 
@@ -63,15 +63,24 @@ fun HomeScreen(navController: NavController) {
 
 
 @Composable
-fun HomeContent(navController: NavController) {
+fun HomeContent(navController: NavController, homeViewModel: HomeViewModel) {
 
-    val listOfBooks = listOf(
-        MBook(id = "ded", title = "Hello Again", authors = "All of us", notes = null),
-        MBook(id = "ded", title = "Again", authors = "All of us", notes = null),
-        MBook(id = "ded", title = "Hello", authors = "All of us", notes = null),
-        MBook(id = "ded", title = "Hello Again", authors = "All of us", notes = null),
-        MBook(id = "ded", title = "Hello Again", authors = "All of us", notes = null),
-    )
+//    val listOfBooks = listOf(
+//        MBook(id = "ded", title = "Hello Again", authors = "All of us", notes = null),
+//        MBook(id = "ded", title = "Again", authors = "All of us", notes = null),
+//        MBook(id = "ded", title = "Hello", authors = "All of us", notes = null),
+//        MBook(id = "ded", title = "Hello Again", authors = "All of us", notes = null),
+//        MBook(id = "ded", title = "Hello Again", authors = "All of us", notes = null),
+//    )
+    var listOfBooks = emptyList<MBook>()
+    val currentUser = FirebaseAuth.getInstance().currentUser
+
+    if (!homeViewModel.data.value.data.isNullOrEmpty()) {
+        listOfBooks = homeViewModel.data.value.data!!.toList().filter { mBook ->
+            mBook.userId == currentUser?.uid.toString()
+        }
+
+    }
 
     val currentUserName =
         if (!FirebaseAuth.getInstance().currentUser?.email.isNullOrEmpty())
@@ -111,7 +120,7 @@ fun HomeContent(navController: NavController) {
 @Composable
 fun BookListArea(listOfBooks: List<MBook>, navController: NavController) {
     HorizontalScrollableComponent(listOfBooks) {
-
+        navController.navigate(route = AllScreens.UpdateScreen.name + "/$it")
     }
 }
 
@@ -127,7 +136,7 @@ fun HorizontalScrollableComponent(listOfBooks: List<MBook>, onCardPressed: (Stri
     ) {
         for (book in listOfBooks) {
             ListCard(book = book) {
-                onCardPressed(it)
+                onCardPressed(book.googleBookId.toString())
             }
         }
     }
@@ -137,10 +146,19 @@ fun HorizontalScrollableComponent(listOfBooks: List<MBook>, onCardPressed: (Stri
 
 @Composable
 fun ReadingRightNowArea(books: List<MBook>, navController: NavController) {
-    ListCard(book = books[0]) {
+    val scrollState = rememberScrollState()
 
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(280.dp)
+            .horizontalScroll(scrollState)
+    ) {
+        for (book in books) {
+            ListCard(book = book) {
+            }
+        }
     }
-
 }
 
 

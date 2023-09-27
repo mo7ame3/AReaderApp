@@ -59,7 +59,7 @@ fun SearchScreen(navController: NavController, searchViewModel: SearchViewModel)
             icon = Icons.Default.ArrowBack,
             showProfile = false
         ) {
-            navController.popBackStack()
+            navController.navigate(route = AllScreens.HomeScreen.name)
         }
     }) {
         Surface(
