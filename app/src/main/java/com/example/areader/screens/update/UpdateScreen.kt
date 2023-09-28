@@ -261,8 +261,6 @@ fun ShowAlertDialog(message: String, openDialog: MutableState<Boolean>, onYesPre
 @ExperimentalComposeUiApi
 @Composable
 fun SimpleForm(
-    modifier: Modifier = Modifier,
-    loading: Boolean = false,
     defaultValue: String,
     onSearch: (String) -> Unit
 ) {

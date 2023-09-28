@@ -54,7 +54,8 @@ fun NavGraph() {
             SearchScreen(navController = navController, searchViewModel = searchViewModel)
         }
         composable(route = AllScreens.StatsScreen.name) {
-            StatsScreen(navController = navController)
+            val homeViewModel = hiltViewModel<HomeViewModel>()
+            StatsScreen(navController = navController, homeViewModel = homeViewModel)
         }
         composable(route = AllScreens.UpdateScreen.name + "/{bookItemId}", arguments = listOf(
             navArgument("bookItemId") {

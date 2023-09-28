@@ -366,13 +366,17 @@ fun ListCard(book: MBook, onPressDetails: (String) -> Unit) {
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.bodyLarge
             )
-
+            val isStartedReading = remember {
+                mutableStateOf(false)
+            }
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.Bottom
             ) {
-                RoundedButton(label = "Reading", radius = 70) {}
+                isStartedReading.value = book.startedReading != null
+
+                RoundedButton(label = if(isStartedReading.value)"Reading" else "Not Yet", radius = 70) {}
 
             }
 
